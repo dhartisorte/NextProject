@@ -65,3 +65,5 @@ export default function UserCard({ user, onEdit, onDelete }: UserCardProps) {
     </div>
   );
 }
+
+export { UserCard }

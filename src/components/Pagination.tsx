@@ -91,3 +91,5 @@ export default function Pagination({
     </div>
   );
 }
+
+export { Pagination }

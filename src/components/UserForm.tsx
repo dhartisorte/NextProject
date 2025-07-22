@@ -188,3 +188,5 @@ export default function UserForm({ isOpen, onClose, onSubmit, user, title }: Use
     </div>
   );
 }
+
+export { UserForm }
