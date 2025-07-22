@@ -1,6 +1,7 @@
-import React from 'react';
-import { User } from '../types';
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+'use client';
+
+import { User } from '@/types';
+import { useState } from 'react';
 
 interface UserCardProps {
   user: User;
@@ -8,47 +9,59 @@ interface UserCardProps {
   onDelete: (id: string) => void;
 }
 
-export const UserCard: React.FC<UserCardProps> = ({ user, onEdit, onDelete }) => {
-  const formatDate = (dateString: string) => {
+export default function UserCard({ user, onEdit, onDelete }: UserCardProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      setIsDeleting(true);
+      await onDelete(user.id);
+      setIsDeleting(false);
+    }
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
     });
   };
 
   return (
-    <div className="card hover:shadow-lg transition-shadow duration-200">
+    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-6 border border-gray-200">
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">{user.name}</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-1">{user.name}</h3>
           <p className="text-gray-600 mb-2">{user.email}</p>
-          <div className="text-sm text-gray-500">
-            <p>Created: {formatDate(user.createdAt)}</p>
-            {user.updatedAt !== user.createdAt && (
-              <p>Updated: {formatDate(user.updatedAt)}</p>
-            )}
-          </div>
+          {user.age && (
+            <p className="text-sm text-gray-500 mb-2">Age: {user.age}</p>
+          )}
         </div>
-        <div className="flex space-x-2 ml-4">
+        <div className="flex space-x-2">
           <button
             onClick={() => onEdit(user)}
-            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-            title="Edit user"
+            className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors duration-200"
           >
-            <PencilIcon className="w-4 h-4" />
+            Edit
           </button>
           <button
-            onClick={() => onDelete(user.id)}
-            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-            title="Delete user"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <TrashIcon className="w-4 h-4" />
+            {isDeleting ? 'Deleting...' : 'Delete'}
           </button>
         </div>
       </div>
+      
+      <div className="text-xs text-gray-400 border-t pt-3">
+        <p>Created: {formatDate(user.createdAt)}</p>
+        {user.updatedAt && user.updatedAt !== user.createdAt && (
+          <p>Updated: {formatDate(user.updatedAt)}</p>
+        )}
+      </div>
     </div>
   );
-};
+}
